@@ -1,8 +1,9 @@
-#include<iostream>
-#include<string>
+#include <iostream>
+#include <string>
 #include <vector>
 #include <algorithm>
-#include<list>
+#include <list>
+#include <climits>
 using namespace std;
 
 struct node{
@@ -21,6 +22,7 @@ public:
 	//node *planets;
 	vector<node*> planets;
 	int **g;
+	bool *path = new bool[Dims];
 	//adjacency list
 
 
@@ -45,7 +47,7 @@ public:
 int editDistance(const string& s1, const string& s2)
 {
 	const std::size_t len1 = s1.size(), len2 = s2.size();
-	std::vector<std::vector<unsigned int>> d(len1 + 1, std::vector<unsigned int>(len2 + 1));
+	std::vector<std::vector<unsigned int> > d(len1 + 1, std::vector<unsigned int>(len2 + 1));
 
 	if (s1 == s2){
 		return 0;
@@ -53,14 +55,22 @@ int editDistance(const string& s1, const string& s2)
 	}
 
 	d[0][0] = 0;
-	for (unsigned int i = 1; i <= len1; ++i) d[i][0] = i;
-	for (unsigned int i = 1; i <= len2; ++i) d[0][i] = i;
+	for (unsigned int i = 1; i <= len1; ++i){ 
+		d[i][0] = i;
+	}
+	for (unsigned int i = 1; i <= len2; ++i){ 
+		d[0][i] = i;
+	}
 
-	for (unsigned int i = 1; i <= len1; ++i)
-		for (unsigned int j = 1; j <= len2; ++j)
+	for (unsigned int i = 1; i <= len1; ++i){
+		for (unsigned int j = 1; j <= len2; ++j){
 			// note that std::min({arg1, arg2, arg3}) works only in C++11,
 			// for C++98 use std::min(std::min(arg1, arg2), arg3)
-			d[i][j] = min({ d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (s1[i - 1] == s2[j - 1] ? 0 : 1) });
+			d[i][j] = min(d[i - 1][j] + 1, d[i][j - 1] + 1);
+			d[i][j] = min( d[i][j] , d[i - 1][j - 1] + (s1[i - 1] == s2[j - 1] ? 0 : 1) );
+		}		
+	}
+			
 	return d[len1][len2];
 }
 
@@ -120,27 +130,31 @@ vector<int> LongestIncreasingSubsequenceLength(int A[], int size)
 int minDistance(int dist[], bool sptSet[], int realms)
 {
 	// Initialize min value
-	int min = INT_MAX, min_index;
+	int min = INT_MAX;
+	int min_index;
 
 	for (int v = 0; v < realms; v++)
-		if (sptSet[v] == false && dist[v] <= min)
-			min = dist[v], min_index = v;
+		if (sptSet[v] == false && dist[v] <= min){
+			min = dist[v]; 
+			min_index = v;
+		}
 
 	return min_index;
 }
 
 void printSolution(int dist[], int n)
 {
-	printf("Vertex   Distance from Source\n");
+	cout << "Vertex   Distance from Source\n";
 	for (int i = 0; i < n; i++)
-		printf("%d \t\t %d\n", i, dist[i]);
+		// printf("%d \t\t %d\n", i, dist[i]);
+		cout << i << " \t\t " << dist[i] << "\n";
 }
 
-void dijkstra(int **graph, int src, int realms)
+bool* dijkstra(int **graph, int src, int realms)
 {
 	int *dist = new int[realms];     // The output array.  dist[i] will hold the shortest
 	// distance from src to i
-
+	//int* path = new int[realms];
 	bool *sptSet = new bool[realms]; // sptSet[i] will true if vertex i is included in shortest
 	// path tree or shortest distance from src to i is finalized
 
@@ -168,12 +182,19 @@ void dijkstra(int **graph, int src, int realms)
 			// u to v, and total weight of path from src to  v through u is 
 			// smaller than current value of dist[v]
 			if (!sptSet[v] && graph[u][v] && dist[u] != INT_MAX
-				&& dist[u] + graph[u][v] < dist[v])
+				&& dist[u] + graph[u][v] < dist[v]){
 				dist[v] = dist[u] + graph[u][v];
+				//path[v] = u;
+			}
 	}
 
+
+
+
+
 	// print the constructed distance array
-	printSolution(dist, realms);
+	//printSolution(dist, realms);
+	return sptSet;
 }
 
 
@@ -183,7 +204,7 @@ int main() {
 	cin >> numRealms;
 
 	Graph *graph = new Graph();
-
+	graph->Dims = numRealms;
 	for (int i = 0; i < numRealms; i++) {
 		string charmOfRealm = "";
 		cin >> charmOfRealm;
@@ -207,6 +228,30 @@ int main() {
 
 
 	}
+
+	string start;
+	int startNode;
+
+	cin >> start;
+
+	string end;
+	int endNode;
+	cin >> end;
+
+	for (int i = 0; i < numRealms; i++){
+
+		if (graph->planets[i]->charm == start){
+			startNode = i;
+
+		}
+
+		else if (graph->planets[i]->charm == end){
+			endNode = i;
+
+		}
+
+	}
+
 	graph->g = new int *[numRealms];
 
 	for (int i = 0; i < numRealms; ++i)
@@ -218,7 +263,7 @@ int main() {
 			//cout << graph->Dims;
 			int s = editDistance(graph->planets.at(i)->charm, graph->planets[j]->charm);
 			
-			if ((graph->planets[i]->subSeqSize) >s && i != j){
+			if ((graph->planets[i]->subSeqSize) >=s && i != j){
 
 				graph->g[i][j] = s;
 
@@ -244,9 +289,17 @@ int main() {
 	}
 
 
-	dijkstra(graph->g, 0, numRealms);
+	graph->path=dijkstra(graph->g, startNode, numRealms);
+
+	for (int i = 0; i < numRealms; i++){
+
+		cout << graph->path[i];
+
+	}
 
 
+
+	system("pause");
 
 
 
