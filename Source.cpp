@@ -4,11 +4,13 @@
 #include <algorithm>
 #include <list>
 #include <climits>
+#include <queue>
+#include <cstring>
 using namespace std;
 
 struct node{
 	int numMagi;
-	vector<int> s;
+	vector<int> s; //
 	int subSeqSize;
 	string charm;
 
@@ -127,19 +129,29 @@ vector<int> LongestIncreasingSubsequenceLength(int A[], int size)
 }
 
 
-int minDistance(int dist[], bool sptSet[], int realms)
+int minDistance(int dist[], int realms, bool visited[])
 {
 	// Initialize min value
 	int min = INT_MAX;
-	int min_index;
+	int min_index = -1; 
 
-	for (int v = 0; v < realms; v++)
-		if (sptSet[v] == false && dist[v] <= min){
-			min = dist[v]; 
-			min_index = v;
+	for(int i = 0; i < realms; i++){
+		if(dist[i] < min && dist[i] > 0 && visited[i] == false){ //might error if step is actually 0
+			min = dist[i];
+			min_index = i;
 		}
+	}
+	// for (int v = 0; v < realms; v++)
+	// 	if (sptSet[v] == false && dist[v] <= min){
+	// 		min = dist[v]; 
+	// 		min_index = v;
+	// 	}
+
+
 
 	return min_index;
+
+	// using u, finds the smallest one that has not been visited
 }
 
 void printSolution(int dist[], int n)
@@ -150,51 +162,152 @@ void printSolution(int dist[], int n)
 		cout << i << " \t\t " << dist[i] << "\n";
 }
 
-bool* dijkstra(int **graph, int src, int realms)
+bool allvisited(bool visited[], int size){
+	cout << "ALL visited \n";
+	for(int i = 0; i < size; i++){
+		if(visited[i] == false){
+			return false;
+		}
+	}
+	return true;
+}
+
+std::vector<int> dijkstra(int **graph, int src, int realms, int end)
 {
 	int *dist = new int[realms];     // The output array.  dist[i] will hold the shortest
 	// distance from src to i
+	int *prev = new int[realms];
 	//int* path = new int[realms];
-	bool *sptSet = new bool[realms]; // sptSet[i] will true if vertex i is included in shortest
+	bool *visited = new bool [realms];
+
+	//bool *sptSet = new bool[realms]; // sptSet[i] will true if vertex i is included in shortest
 	// path tree or shortest distance from src to i is finalized
-
+	//std::vector<int> Q;
 	// Initialize all distances as INFINITE and stpSet[] as false
-	for (int i = 0; i < realms; i++)
-		dist[i] = INT_MAX, sptSet[i] = false;
-
+	cout << "Initializer \n";
+	for (int i = 0; i < realms; i++){
+		dist[i] = INT_MAX;
+		prev[i] = -1; 
+		visited[i] = false;
+	}	//sptSet[i] = false;
+		//Q.push_back(i);
 	// Distance of source vertex from itself is always 0
 	dist[src] = 0;
+	prev[src] = -1;
+	visited[src] = true;
 
-	// Find shortest path for all vertices
-	for (int count = 0; count < realms - 1; count++)
-	{
-		// Pick the minimum distance vertex from the set of vertices not
-		// yet processed. u is always equal to src in first iteration.
-		int u = minDistance(dist, sptSet, realms);
 
-		// Mark the picked vertex as processed
-		sptSet[u] = true;
+	int u = src;
+	//Q.erase(src);
+	//order will not be there for Q
+	bool first = true;
+	while(!allvisited(visited, realms) ){
+		if(first == true){
+			cout << "u is " << u << endl;
+		}
+		else{
+			cout << "minDistance to " << u <<" \n";
 
-		// Update dist value of the adjacent vertices of the picked vertex.
-		for (int v = 0; v < realms; v++)
-
-			// Update dist[v] only if is not in sptSet, there is an edge from 
-			// u to v, and total weight of path from src to  v through u is 
-			// smaller than current value of dist[v]
-			if (!sptSet[v] && graph[u][v] && dist[u] != INT_MAX
-				&& dist[u] + graph[u][v] < dist[v]){
-				dist[v] = dist[u] + graph[u][v];
-				//path[v] = u;
+			cout << "dist: ";
+			for(int q = 0; q < realms; q++){
+				cout << dist[q] << " ";
 			}
+			cout << "prev: ";
+			for(int q = 0; q < realms; q++){
+				cout << prev[q] << " ";
+			}
+			cout << endl;
+			u = minDistance(dist, realms, visited);
+			cout << "Traveled to " << u <<" \n";
+			if(u == -1){
+				//no more to be found or some are unreachable
+				cout << "u is -1 \n";
+
+				break;
+			}
+			visited[u] = true;
+		}
+		cout << "Checking for faster routes \n";
+		for(int k = 0; k < realms; k++){
+			//cout << "k is " << k << "\n";
+			//cout << "graph[u][k] is " << graph[u][k] << endl;
+			if(k != u && graph[u][k] != -1){ //Don't travel to your selected node
+				int alt = dist[u] + graph[u][k];
+				if(alt < dist[k] ){
+					cout << "made " << k << " have a distance of " << alt << endl;
+					cout << "it's  previous is now " << u << endl;
+					dist[k] = alt;
+					prev[k] = u;
+				}
+
+
+
+			}
+		}
+		if(first == true){
+			first = false;
+		}
+
+
 	}
 
+	// // Find shortest path for all vertices
+	// for (int count = 0; count < realms - 1; count++)
+	// {
+	// 	// Pick the minimum distance vertex from the set of vertices not
+	// 	// yet processed. u is always equal to src in first iteration.
+	// 	int u = minDistance(dist, sptSet, realms);
 
+	// 	// Mark the picked vertex as processed
+	// 	sptSet[u] = true;
+
+	// 	// Update dist value of the adjacent vertices of the picked vertex.
+	// 	for (int v = 0; v < realms; v++)
+
+	// 		// Update dist[v] only if is not in sptSet, there is an edge from 
+	// 		// u to v, and total weight of path from src to  v through u is 
+	// 		// smaller than current value of dist[v]
+	// 		if (!sptSet[v] && graph[u][v] && dist[u] != INT_MAX
+	// 			&& dist[u] + graph[u][v] < dist[v]){
+	// 			dist[v] = dist[u] + graph[u][v];
+	// 			//path[v] = u;
+	// 		}
+	// }
+	std::vector<int> rpath;
+	int current = end;
+	rpath.push_back(current);
+	cout << "pushing " << current << endl;
+	while(current != -1){//tracing the path
+		rpath.push_back(prev[current]);
+		cout << "pushing " << prev[current] << endl;
+		current = prev[current];
+
+	}
+	//reverse the order because it's backwards
+	int size = rpath.size();
+	int routesize;
+	std::vector<int> path;
+	//int path[size -1] = new int[size - 1];
+	//memset( path, 0, (size - 1)*sizeof(int) );
+	int k = size -2;
+	for(int h = 0; h < size -1; h++){
+		path.push_back(rpath[k]);
+
+		k--;
+	} 
+	cout << "Path: ";
+	for(int h = 0; h < size - 1; h++){
+		cout << path[h] << " ";
+	}
+	cout << endl;
+	routesize = size -1;
+	//*route = path;
 
 
 
 	// print the constructed distance array
 	//printSolution(dist, realms);
-	return sptSet;
+	return path;
 }
 
 
@@ -221,10 +334,10 @@ int main() {
 
 		n->numMagi = numMagi;
 		vector<int> list = LongestIncreasingSubsequenceLength(magiArray, numMagi);
-		n->s = list;
+		n->s = list; //list of the longest increasing subsequence
 		n->subSeqSize = list.size();
 		n->charm = charmOfRealm;
-		graph->planets.push_back(n);
+		graph->planets.push_back(n);//push the planet nodes into the greater graph
 
 
 	}
@@ -269,7 +382,7 @@ int main() {
 
 			}
 			else{
-				graph->g[i][j] = 0;
+				graph->g[i][j] = -1; //-1 denotes it does not exist
 
 			}
 
@@ -282,24 +395,32 @@ int main() {
 
 		for (int j = 0; j < numRealms; j++)
 
-			cout << graph->g[i][j] << ", ";
+			cout << graph->g[i][j] << " ";
 
 		cout << endl;
 
 	}
 
 
-	graph->path=dijkstra(graph->g, startNode, numRealms);
 
-	for (int i = 0; i < numRealms; i++){
+	//graph->path=dijkstra(graph->g, startNode, numRealms, endNode);//needs to itereate through an array
+	//int *route;
+	//int *route = new std::vector<int>;
+	std::vector<int> route = dijkstra(graph->g, startNode, numRealms, endNode);
 
-		cout << graph->path[i];
+	//int &rs = routesize;
+	cout << "Printing out route: ";
+	for (int i = 0; i < route.size(); i++){
+
+		cout << route[i] << " ";
 
 	}
 
+	cout << endl;
 
 
-	system("pause");
+
+	//system("pause");
 
 
 
