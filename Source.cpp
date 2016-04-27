@@ -46,6 +46,7 @@ public:
 
 
 
+
 int editDistance(const string& s1, const string& s2)
 {
 	const std::size_t len1 = s1.size(), len2 = s2.size();
@@ -95,37 +96,88 @@ vector<int> LongestIncreasingSubsequenceLength(int A[], int size)
 {
 	// Add boundary case, when array size is one
 
-	int len; // always points empty slot
-	vector<int> temp;
-	//memset(tailTable, 0, sizeof(tailTable[0])*size);
+	// int len; // always points empty slot
+	// vector<int> temp;
+	// //memset(tailTable, 0, sizeof(tailTable[0])*size);
 
 
-	temp.push_back(A[0]);
-	len = 1;
-	for (int i = 1; i < size; i++)
-	{
-		if (A[i] < temp.front()){
-			// new smallest value
+	// temp.push_back(A[0]);
+	// len = 1;
+	// for (int i = 1; i < size; i++)
+	// {
+	// 	if (A[i] < temp.front()){
+	// 		// new smallest value
 
-			temp.pop_back();
-			temp.push_back(A[i]);
+	// 		temp.pop_back();
+	// 		temp.push_back(A[i]);
+	// 	}
+	// 	else if (A[i] > temp.back()){
+	// 		//tailTable[len++] = A[i];
+	// 		temp.push_back(A[i]);
+
+	// 	}
+	// 	// A[i] wants to extend largest subsequence
+
+
+	// 	else
+	// 		// A[i] wants to be current end candidate of an existing
+	// 		// subsequence. It will replace ceil value in tailTable
+	// 		temp[CeilIndex(temp, -1, len - 1, A[i])] = A[i];
+	// }
+
+
+	// return temp;
+	int totalSubSets = 1;
+	std::vector<std::vector<int> > Subset;
+
+	
+	for(int i = 0; i < size; i++){
+		cout << "i is " << i << endl;
+		for(int k = 0; k < totalSubSets; k++){
+			cout << "k is " << k << endl;
+			cout << Subset.empty() << endl;
+			if(Subset.empty()){
+				cout << "Is Empty\n";
+				Subset.push_back(A[i]);
+			}
+			else if(A[i] > Subset[k][i-1]){
+				cout << "adding" << A[i] << "\n";
+				Subset[k].push_back(A[i]); 
+			}
+			else if(A[i] < Subset[k][i-1]){
+				cout << "less than" << A[i] << "\n";
+				bool isInOtherSubSet = false;
+				for(int h = 0; h < Subset.size(); h++){
+
+					for(int s = 0; s < Subset[h].size(); s++){
+						if(Subset[h][s] == A[i]){
+							isInOtherSubSet = true;
+						}
+						
+					}
+
+				}
+				if(!isInOtherSubSet){
+					totalSubSets++;
+					k = totalSubSets + 1;
+				}
+				else{
+					//Do nothing, the number is already there
+				}
+			}
 		}
-		else if (A[i] > temp.back()){
-			//tailTable[len++] = A[i];
-			temp.push_back(A[i]);
-
-		}
-		// A[i] wants to extend largest subsequence
-
-
-		else
-			// A[i] wants to be current end candidate of an existing
-			// subsequence. It will replace ceil value in tailTable
-			temp[CeilIndex(temp, -1, len - 1, A[i])] = A[i];
 	}
+	int max = 0;
+	int indexOfMax = 0;
+	for(int i = 0; i < totalSubSets; i++){
+		if (max < Subset[i].size()){
+			max = Subset[i].size();
+			indexOfMax = i;
+		}
+	}
+return Subset[indexOfMax];
 
 
-	return temp;
 }
 
 
@@ -156,14 +208,15 @@ int minDistance(int dist[], int realms, bool visited[])
 
 void printSolution(int dist[], int n)
 {
-	cout << "Vertex   Distance from Source\n";
-	for (int i = 0; i < n; i++)
+	// cout << "Vertex   Distance from Source\n";
+	for (int i = 0; i < n; i++){
 		// printf("%d \t\t %d\n", i, dist[i]);
-		cout << i << " \t\t " << dist[i] << "\n";
+		// cout << i << " \t\t " << dist[i] << "\n";
+	}
 }
 
 bool allvisited(bool visited[], int size){
-	cout << "ALL visited \n";
+	// cout << "ALL visited \n";
 	for(int i = 0; i < size; i++){
 		if(visited[i] == false){
 			return false;
@@ -172,7 +225,7 @@ bool allvisited(bool visited[], int size){
 	return true;
 }
 
-std::vector<int> dijkstra(int **graph, int src, int realms, int end)
+std::vector<int> dijkstra(int **graph, int src, int realms, int end, int *&distoutput, int *&prevoutput)
 {
 	int *dist = new int[realms];     // The output array.  dist[i] will hold the shortest
 	// distance from src to i
@@ -184,7 +237,7 @@ std::vector<int> dijkstra(int **graph, int src, int realms, int end)
 	// path tree or shortest distance from src to i is finalized
 	//std::vector<int> Q;
 	// Initialize all distances as INFINITE and stpSet[] as false
-	cout << "Initializer \n";
+	// cout << "Initializer \n";
 	for (int i = 0; i < realms; i++){
 		dist[i] = INT_MAX;
 		prev[i] = -1; 
@@ -203,10 +256,10 @@ std::vector<int> dijkstra(int **graph, int src, int realms, int end)
 	bool first = true;
 	while(!allvisited(visited, realms) ){
 		if(first == true){
-			cout << "u is " << u << endl;
+			// cout << "u is " << u << endl;
 		}
 		else{
-			cout << "minDistance to " << u <<" \n";
+			// cout << "minDistance to " << u <<" \n";
 
 			cout << "dist: ";
 			for(int q = 0; q < realms; q++){
@@ -218,24 +271,24 @@ std::vector<int> dijkstra(int **graph, int src, int realms, int end)
 			}
 			cout << endl;
 			u = minDistance(dist, realms, visited);
-			cout << "Traveled to " << u <<" \n";
+			// cout << "Traveled to " << u <<" \n";
 			if(u == -1){
 				//no more to be found or some are unreachable
-				cout << "u is -1 \n";
+				// cout << "u is -1 \n";
 
 				break;
 			}
 			visited[u] = true;
 		}
-		cout << "Checking for faster routes \n";
+		// cout << "Checking for faster routes \n";
 		for(int k = 0; k < realms; k++){
 			//cout << "k is " << k << "\n";
 			//cout << "graph[u][k] is " << graph[u][k] << endl;
 			if(k != u && graph[u][k] != -1){ //Don't travel to your selected node
 				int alt = dist[u] + graph[u][k];
 				if(alt < dist[k] ){
-					cout << "made " << k << " have a distance of " << alt << endl;
-					cout << "it's  previous is now " << u << endl;
+					// cout << "made " << k << " have a distance of " << alt << endl;
+					// cout << "it's  previous is now " << u << endl;
 					dist[k] = alt;
 					prev[k] = u;
 				}
@@ -276,10 +329,10 @@ std::vector<int> dijkstra(int **graph, int src, int realms, int end)
 	std::vector<int> rpath;
 	int current = end;
 	rpath.push_back(current);
-	cout << "pushing " << current << endl;
+	// cout << "pushing " << current << endl;
 	while(current != -1){//tracing the path
 		rpath.push_back(prev[current]);
-		cout << "pushing " << prev[current] << endl;
+		// cout << "pushing " << prev[current] << endl;
 		current = prev[current];
 
 	}
@@ -303,6 +356,8 @@ std::vector<int> dijkstra(int **graph, int src, int realms, int end)
 	routesize = size -1;
 	//*route = path;
 
+	distoutput = dist;
+	prevoutput = prev;
 
 
 	// print the constructed distance array
@@ -372,18 +427,21 @@ int main() {
 
 	for (int i = 0; i < numRealms; i++){
 		//graph.g[i] = new int[numRealms]();
+		// cout << "for i = " << i << endl;
 		for (int j = 0; j < numRealms; j++){
 			//cout << graph->Dims;
+			// cout << "for j = " << j << endl;
 			int s = editDistance(graph->planets.at(i)->charm, graph->planets[j]->charm);
-			
+			// cout << "the difference between the charms " << s << endl;
+			// cout << "subSeqSize is for " << i << " is " << graph->planets[i]->subSeqSize << endl;
 			if ((graph->planets[i]->subSeqSize) >=s && i != j){
-
+				// cout << "takes " << s << " to get from " << i << " to " << j << endl;
 				graph->g[i][j] = s;
 
 			}
 			else{
-				graph->g[i][j] = -1; //-1 denotes it does not exist
-
+				graph->g[i][j] = -1; //-1 denotes it is visiting its own node or there is no path that exists
+				// cout << "its own or doesn not exist\n";
 			}
 
 
@@ -393,10 +451,11 @@ int main() {
 
 	for (int i = 0; i < numRealms; i++){
 
-		for (int j = 0; j < numRealms; j++)
+		for (int j = 0; j < numRealms; j++){
 
 			cout << graph->g[i][j] << " ";
 
+		}	
 		cout << endl;
 
 	}
@@ -406,18 +465,84 @@ int main() {
 	//graph->path=dijkstra(graph->g, startNode, numRealms, endNode);//needs to itereate through an array
 	//int *route;
 	//int *route = new std::vector<int>;
-	std::vector<int> route = dijkstra(graph->g, startNode, numRealms, endNode);
+	int *s2fdist = new int [numRealms]; //start to finish with the optimal distances
+	int *s2fprev = new int [numRealms]; //start to finish with the previous node
 
-	//int &rs = routesize;
-	cout << "Printing out route: ";
-	for (int i = 0; i < route.size(); i++){
+	std::vector<int> route = dijkstra(graph->g, startNode, numRealms, endNode, s2fdist, s2fprev);
 
-		cout << route[i] << " ";
 
+
+	cout << "Printing the Subsets \n";
+	for(int q = 0; q < numRealms; q++){
+		cout << "For realm " << q << endl;
+		for(int y = 0; y < graph->planets[q]->s.size(); y++){
+			cout << graph->planets[q]->s[y] << " ";
+		}
+		cout << endl;
 	}
+	//int &rs = routesize;
+	// cout << "Printing out route: ";
+	if(route.empty()){
+		cout << "IMPOSSIBLE \n"; //TODO, fix if the doesn't end up to start
+	}
+	else{
+		for (int i = 0; i < route.size(); i++){
 
-	cout << endl;
+			 cout << route[i] << " ";
 
+		}
+
+		cout << endl;
+		cout << "Incantations: " << s2fdist[endNode] << endl;
+		int s2fgems = 0;
+		for(int k = 0; k < route.size() - 1; k++){
+			int depart = route[k];
+			int destination = route[k+1];
+			int incantations = graph->g[depart][destination];
+			int localgems = 0;
+			for(int p = 0; p < incantations; p++){
+				cout << "adding to local: " << graph->planets[depart]->s[p] << endl;
+				localgems = localgems + graph->planets[depart]->s[p];
+			}
+			cout << "adding to global: " << localgems << endl;
+			s2fgems = s2fgems + localgems;
+			cout << "totalgems: " << s2fgems << endl;
+		}
+
+		cout << "Gems: " << s2fgems << endl;
+	}
+	int *f2sdist = new int [numRealms]; //start to finish with the optimal distances
+	int *f2sprev = new int [numRealms]; //start to finish with the previous node
+
+	std::vector<int> returnroute = dijkstra(graph->g, endNode, numRealms, startNode, f2sdist, f2sprev);
+	
+	if(!route.empty() && returnroute.empty()){//TODO CHANGE
+		cout << "IMPOSSIBLE \n";
+	}
+	else{
+		for (int i = 0; i < returnroute.size(); i++){
+
+			cout << returnroute[i] << " ";
+
+		}
+
+		cout << endl;
+		cout << "Incantations: " << f2sdist[startNode] << endl;
+		int f2sgems = 0;
+		for(int k = 0; k < route.size() - 2; k++){
+			int depart = returnroute[k];
+			int destination = returnroute[k+1];
+			int incantations = graph->g[depart][destination];
+			int localgems = 0;
+			for(int p = 0; p < incantations; p++){
+
+				localgems = localgems + graph->planets[depart]->s[p];
+			}
+			f2sgems = f2sgems + localgems;
+		}
+
+		cout << "Gems: " << f2sgems << endl;
+	}
 
 
 	//system("pause");
