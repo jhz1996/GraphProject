@@ -92,9 +92,9 @@ int CeilIndex(vector<int> &A, int l, int r, int key)
 	return r;
 }
 
-vector<int> LongestIncreasingSubsequenceLength(int A[], int size)
-{
-	// Add boundary case, when array size is one
+// vector<int> LongestIncreasingSubsequenceLength(int A[], int size)
+// {
+	// //Add boundary case, when array size is one
 
 	// int len; // always points empty slot
 	// vector<int> temp;
@@ -127,57 +127,97 @@ vector<int> LongestIncreasingSubsequenceLength(int A[], int size)
 
 
 	// return temp;
-	int totalSubSets = 1;
-	std::vector<std::vector<int> > Subset;
+// 	int totalSubSets = 1;
+// 	std::vector<std::vector<int> > Subset;
 
 	
-	for(int i = 0; i < size; i++){
-		cout << "i is " << i << endl;
-		for(int k = 0; k < totalSubSets; k++){
-			cout << "k is " << k << endl;
-			cout << Subset.empty() << endl;
-			if(Subset.empty()){
-				cout << "Is Empty\n";
-				Subset.push_back(A[i]);
-			}
-			else if(A[i] > Subset[k][i-1]){
-				cout << "adding" << A[i] << "\n";
-				Subset[k].push_back(A[i]); 
-			}
-			else if(A[i] < Subset[k][i-1]){
-				cout << "less than" << A[i] << "\n";
-				bool isInOtherSubSet = false;
-				for(int h = 0; h < Subset.size(); h++){
+// 	for(int i = 0; i < size; i++){
+// 		cout << "i is " << i << endl;
+// 		for(int k = 0; k < totalSubSets; k++){
+// 			cout << "k is " << k << endl;
+// 			cout << Subset.empty() << endl;
+// 			if(Subset.empty()){
+// 				cout << "Is Empty\n";
+// 				Subset.push_back(A[i]);
+// 			}
+// 			else if(A[i] > Subset[k][i-1]){
+// 				cout << "adding" << A[i] << "\n";
+// 				Subset[k].push_back(A[i]); 
+// 			}
+// 			else if(A[i] < Subset[k][i-1]){
+// 				cout << "less than" << A[i] << "\n";
+// 				bool isInOtherSubSet = false;
+// 				for(int h = 0; h < Subset.size(); h++){
 
-					for(int s = 0; s < Subset[h].size(); s++){
-						if(Subset[h][s] == A[i]){
-							isInOtherSubSet = true;
-						}
+// 					for(int s = 0; s < Subset[h].size(); s++){
+// 						if(Subset[h][s] == A[i]){
+// 							isInOtherSubSet = true;
+// 						}
 						
-					}
+// 					}
 
-				}
-				if(!isInOtherSubSet){
-					totalSubSets++;
-					k = totalSubSets + 1;
-				}
-				else{
-					//Do nothing, the number is already there
-				}
-			}
+// 				}
+// 				if(!isInOtherSubSet){
+// 					totalSubSets++;
+// 					k = totalSubSets + 1;
+// 				}
+// 				else{
+// 					//Do nothing, the number is already there
+// 				}
+// 			}
+// 		}
+// 	}
+// 	int max = 0;
+// 	int indexOfMax = 0;
+// 	for(int i = 0; i < totalSubSets; i++){
+// 		if (max < Subset[i].size()){
+// 			max = Subset[i].size();
+// 			indexOfMax = i;
+// 		}
+// 	}
+// return Subset[indexOfMax];
+
+
+// }
+
+void find_lis(vector<int> &a, vector<int> &b)
+{
+	vector<int> p(a.size());
+	int u, v;
+ 
+	if (a.empty()) return;
+ 
+	b.push_back(0);
+ 
+	for (size_t i = 1; i < a.size(); i++) 
+        {
+                // If next element a[i] is greater than last element of
+                // current longest subsequence a[b.back()], just push it at back of "b" and continue
+		if (a[b.back()] < a[i]) 
+                {
+			p[i] = b.back();
+			b.push_back(i);
+			continue;
 		}
-	}
-	int max = 0;
-	int indexOfMax = 0;
-	for(int i = 0; i < totalSubSets; i++){
-		if (max < Subset[i].size()){
-			max = Subset[i].size();
-			indexOfMax = i;
+ 
+                // Binary search to find the smallest element referenced by b which is just bigger than a[i]
+                // Note : Binary search is performed on b (and not a).
+                // Size of b is always <=k and hence contributes O(log k) to complexity.    
+		for (u = 0, v = b.size()-1; u < v;) 
+                {
+			int c = (u + v) / 2;
+			if (a[b[c]] < a[i]) u=c+1; else v=c;
 		}
+ 
+                // Update b if new value is smaller then previously referenced value 
+		if (a[i] < a[b[u]]) 
+                {
+			if (u > 0) p[i] = b[u-1];
+			b[u] = i;
+		}	
 	}
-return Subset[indexOfMax];
-
-
+ 
+	for (u = b.size(), v = b.back(); u--; v = p[v]) b[u] = v;
 }
 
 
@@ -379,6 +419,8 @@ int main() {
 		int numMagi = 0;
 		cin >> numMagi;
 		int *magiArray = new int[numMagi];
+
+		//std::vector<int> magiArray;
 		node*n = new node();
 
 		for (int j = 0; j < numMagi; j++) {
@@ -388,7 +430,23 @@ int main() {
 		}
 
 		n->numMagi = numMagi;
-		vector<int> list = LongestIncreasingSubsequenceLength(magiArray, numMagi);
+		int *a = new int[numMagi];
+
+		for(int o = 0; o < numMagi; o++){
+			a[o] = magiArray[o];
+		}
+
+		//vector<int> list = LongestIncreasingSubsequenceLength(magiArray, numMagi);
+		vector<int> list;
+		vector<int> seq(a, a+sizeof(a)/sizeof(a[0])); // seq : Input Vector
+		vector<int> lis;                              // lis : Vector containing indexes of longest subsequence 
+        find_lis(seq, lis);
+
+        for (size_t i = 0; i < lis.size(); i++){
+        	list.push_back(magiArray[lis[i]]);
+        }
+
+
 		n->s = list; //list of the longest increasing subsequence
 		n->subSeqSize = list.size();
 		n->charm = charmOfRealm;
