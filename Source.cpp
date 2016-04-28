@@ -92,41 +92,41 @@ int CeilIndex(vector<int> &A, int l, int r, int key)
 	return r;
 }
 
-// vector<int> LongestIncreasingSubsequenceLength(int A[], int size)
-// {
-	// //Add boundary case, when array size is one
+vector<int> LongestIncreasingSubsequenceLength(int A[], int size)
+{
+	//Add boundary case, when array size is one
 
-	// int len; // always points empty slot
-	// vector<int> temp;
-	// //memset(tailTable, 0, sizeof(tailTable[0])*size);
-
-
-	// temp.push_back(A[0]);
-	// len = 1;
-	// for (int i = 1; i < size; i++)
-	// {
-	// 	if (A[i] < temp.front()){
-	// 		// new smallest value
-
-	// 		temp.pop_back();
-	// 		temp.push_back(A[i]);
-	// 	}
-	// 	else if (A[i] > temp.back()){
-	// 		//tailTable[len++] = A[i];
-	// 		temp.push_back(A[i]);
-
-	// 	}
-	// 	// A[i] wants to extend largest subsequence
+	int len; // always points empty slot
+	vector<int> temp;
+	//memset(tailTable, 0, sizeof(tailTable[0])*size);
 
 
-	// 	else
-	// 		// A[i] wants to be current end candidate of an existing
-	// 		// subsequence. It will replace ceil value in tailTable
-	// 		temp[CeilIndex(temp, -1, len - 1, A[i])] = A[i];
-	// }
+	temp.push_back(A[0]);
+	len = 1;
+	for (int i = 1; i < size; i++)
+	{
+		if (A[i] < temp.front()){
+			// new smallest value
+
+			temp.pop_back();
+			temp.push_back(A[i]);
+		}
+		else if (A[i] > temp.back()){
+			//tailTable[len++] = A[i];
+			temp.push_back(A[i]);
+
+		}
+		// A[i] wants to extend largest subsequence
 
 
-	// return temp;
+		else
+			// A[i] wants to be current end candidate of an existing
+			// subsequence. It will replace ceil value in tailTable
+			temp[CeilIndex(temp, -1, len - 1, A[i])] = A[i];
+	}
+
+
+	return temp;
 // 	int totalSubSets = 1;
 // 	std::vector<std::vector<int> > Subset;
 
@@ -178,7 +178,7 @@ int CeilIndex(vector<int> &A, int l, int r, int key)
 // return Subset[indexOfMax];
 
 
-// }
+}
 
 void find_lis(vector<int> &a, vector<int> &b)
 {
@@ -301,15 +301,15 @@ std::vector<int> dijkstra(int **graph, int src, int realms, int end, int *&disto
 		else{
 			// cout << "minDistance to " << u <<" \n";
 
-			cout << "dist: ";
+			// cout << "dist: ";
 			for(int q = 0; q < realms; q++){
-				cout << dist[q] << " ";
+				// cout << dist[q] << " ";
 			}
-			cout << "prev: ";
+			// cout << "prev: ";
 			for(int q = 0; q < realms; q++){
-				cout << prev[q] << " ";
+				// cout << prev[q] << " ";
 			}
-			cout << endl;
+			// cout << endl;
 			u = minDistance(dist, realms, visited);
 			// cout << "Traveled to " << u <<" \n";
 			if(u == -1){
@@ -388,11 +388,11 @@ std::vector<int> dijkstra(int **graph, int src, int realms, int end, int *&disto
 
 		k--;
 	} 
-	cout << "Path: ";
+	// cout << "Path: ";
 	for(int h = 0; h < size - 1; h++){
-		cout << path[h] << " ";
+		//cout << path[h] << " ";
 	}
-	cout << endl;
+	// cout << endl;
 	routesize = size -1;
 	//*route = path;
 
@@ -418,7 +418,9 @@ int main() {
 		cin >> charmOfRealm;
 		int numMagi = 0;
 		cin >> numMagi;
-		int *magiArray = new int[numMagi];
+
+		//int *magiArray = new int[numMagi];
+		vector<int> magiArray;
 
 		//std::vector<int> magiArray;
 		node*n = new node();
@@ -426,21 +428,21 @@ int main() {
 		for (int j = 0; j < numMagi; j++) {
 			int powerMagi = 0;
 			cin >> powerMagi;
-			magiArray[j] = powerMagi;
+			magiArray.push_back(powerMagi);
 		}
 
 		n->numMagi = numMagi;
-		int *a = new int[numMagi];
+		//int *a = new int[numMagi];
 
-		for(int o = 0; o < numMagi; o++){
-			a[o] = magiArray[o];
-		}
+		// for(int o = 0; o < numMagi; o++){
+		// 	a[o] = magiArray[o];
+		// }
 
 		//vector<int> list = LongestIncreasingSubsequenceLength(magiArray, numMagi);
 		vector<int> list;
-		vector<int> seq(a, a+sizeof(a)/sizeof(a[0])); // seq : Input Vector
+		//vector<int> seq(a, a+sizeof(a)/sizeof(a[0])); // seq : Input Vector
 		vector<int> lis;                              // lis : Vector containing indexes of longest subsequence 
-        find_lis(seq, lis);
+        find_lis(magiArray, lis);
 
         for (size_t i = 0; i < lis.size(); i++){
         	list.push_back(magiArray[lis[i]]);
@@ -511,10 +513,10 @@ int main() {
 
 		for (int j = 0; j < numRealms; j++){
 
-			cout << graph->g[i][j] << " ";
+			// cout << graph->g[i][j] << " ";
 
 		}	
-		cout << endl;
+		// cout << endl;
 
 	}
 
@@ -530,28 +532,28 @@ int main() {
 
 
 
-	cout << "Printing the Subsets \n";
+	//cout << "Printing the Subsets \n";
 	for(int q = 0; q < numRealms; q++){
-		cout << "For realm " << q << endl;
+		//cout << "For realm " << q << endl;
 		for(int y = 0; y < graph->planets[q]->s.size(); y++){
-			cout << graph->planets[q]->s[y] << " ";
+		//	cout << graph->planets[q]->s[y] << " ";
 		}
-		cout << endl;
+		//cout << endl;
 	}
 	//int &rs = routesize;
 	// cout << "Printing out route: ";
 	if(route.empty()){
-		cout << "IMPOSSIBLE \n"; //TODO, fix if the doesn't end up to start
+		//cout << "IMPOSSIBLE \n"; //TODO, fix if the doesn't end up to start
 	}
 	else{
 		for (int i = 0; i < route.size(); i++){
 
-			 cout << route[i] << " ";
+			 //cout << route[i] << " ";
 
 		}
 
-		cout << endl;
-		cout << "Incantations: " << s2fdist[endNode] << endl;
+		//cout << endl;
+		//cout << "Incantations: " << s2fdist[endNode] << endl;
 		int s2fgems = 0;
 		for(int k = 0; k < route.size() - 1; k++){
 			int depart = route[k];
@@ -559,15 +561,22 @@ int main() {
 			int incantations = graph->g[depart][destination];
 			int localgems = 0;
 			for(int p = 0; p < incantations; p++){
-				cout << "adding to local: " << graph->planets[depart]->s[p] << endl;
+				//cout << "adding to local: " << graph->planets[depart]->s[p] << endl;
 				localgems = localgems + graph->planets[depart]->s[p];
 			}
-			cout << "adding to global: " << localgems << endl;
+			//cout << "adding to global: " << localgems << endl;
 			s2fgems = s2fgems + localgems;
-			cout << "totalgems: " << s2fgems << endl;
+			//cout << "totalgems: " << s2fgems << endl;
 		}
 
-		cout << "Gems: " << s2fgems << endl;
+		//cout << "Gems: " << s2fgems << endl;
+
+		if(s2fdist[endNode] >= 2147483647){
+			cout << "IMPOSSIBLE \n";
+		}
+		else{
+			cout << s2fdist[endNode] << " " << s2fgems << "\n";
+		}
 	}
 	int *f2sdist = new int [numRealms]; //start to finish with the optimal distances
 	int *f2sprev = new int [numRealms]; //start to finish with the previous node
@@ -575,38 +584,72 @@ int main() {
 	std::vector<int> returnroute = dijkstra(graph->g, endNode, numRealms, startNode, f2sdist, f2sprev);
 	
 	if(!route.empty() && returnroute.empty()){//TODO CHANGE
-		cout << "IMPOSSIBLE \n";
+		//cout << "IMPOSSIBLE \n";
 	}
 	else{
 		for (int i = 0; i < returnroute.size(); i++){
 
-			cout << returnroute[i] << " ";
+			//cout << returnroute[i] << " ";
 
 		}
 
-		cout << endl;
-		cout << "Incantations: " << f2sdist[startNode] << endl;
+		//cout << endl;
+		//cout << "Incantations: " << f2sdist[startNode] << endl;
 		int f2sgems = 0;
-		for(int k = 0; k < route.size() - 2; k++){
+		for(int k = 0; k < returnroute.size() - 1; k++){
 			int depart = returnroute[k];
 			int destination = returnroute[k+1];
 			int incantations = graph->g[depart][destination];
 			int localgems = 0;
 			for(int p = 0; p < incantations; p++){
-
+				//cout << "adding to local: " << graph->planets[depart]->s[p] << endl;
 				localgems = localgems + graph->planets[depart]->s[p];
 			}
+			//cout << "adding to global: " << localgems << endl;
 			f2sgems = f2sgems + localgems;
 		}
+		//cout << "Gems: " << f2sgems << endl;
 
-		cout << "Gems: " << f2sgems << endl;
+		//cout << "Gems: " << f2sgems << endl;
+		if(f2sdist[startNode] >= 2147483647){
+			cout << "IMPOSSIBLE \n";
+		}
+		else{
+			cout << f2sdist[startNode] << " " << f2sgems << "\n";
+		}
 	}
 
+	// cout << "________Testing for the LongestIncreasingSubsequenceLength______\n";
+	// cout << "size?\n";
+	// int testsize;
+	// cin >> testsize;
+	// //int *array = new int[testsize];
+	// vector<int> array;
+	// for(int i = 0; i < testsize; i++){
+	// 	int tmp;
+	// 	cin >> tmp;
+	// 	array.push_back(tmp);
+	// }
+	// vector<int> input;
+	// //vector<int> input = LongestIncreasingSubsequenceLength(array, testsize);
+	// //vector<int> seq(array, array+sizeof(array)/sizeof(array[0])); // seq : Input Vector
+	// vector<int> lis;                              // lis : Vector containing indexes of longest subsequence 
+ //    find_lis(array, lis);
 
+ //    for (size_t i = 0; i < lis.size(); i++){
+ //        input.push_back(array[lis[i]]);
+ //    }
+
+	// cout << "-----------Output----------\n";
+	// for(int e = 0; e < input.size(); e++){
+	// 	cout << input[e];
+	// }
 	//system("pause");
 
 
 
+
+return 0;
 
 
 }
